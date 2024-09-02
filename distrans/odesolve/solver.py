@@ -1,9 +1,5 @@
-from typing import Callable, Optional
-from enum import Enum
+from typing import Callable, Optional,Sequence
 from torch import Tensor
-
-from torch import Tensor
-from typing import Callable,Sequence
 
 def rk_step(
     f: Callable[[Tensor, Tensor], Tensor],
@@ -14,7 +10,25 @@ def rk_step(
     b: Sequence,
     b_star: Optional[Sequence]=None,
     return_error: bool = False
-    ):
+    )->Tensor:
+    """
+    Runge-Kutta step with a general Butcher tableau.
+    The number of function evaluations is len(ca)+1.
+    
+    Args:
+        f (Callable[[Tensor, Tensor], Tensor]): function to integrate
+        x: (Tensor) current state
+        t: (Tensor) current time
+        dt (Tensor): time step
+        ca (Tensor): coefficients for the Runge-Kutta method
+        b (Tensor): coefficients for the Runge-Kutta method
+        b_star (Tensor): coefficients for the error estimate
+        return_error (bool): whether to return the error estimate
+    
+    Returns:
+        x_new: new state
+    
+    """
     ks=[f(t,x)]
     for ca_i in ca:
         ks.append(f(t+ca_i[0]*dt,
@@ -32,7 +46,7 @@ def euler(
     t: Tensor,
     dt: Tensor,
 ):
-    "first order Euler method"
+    """ First order Euler method. NFE=1"""
     return rk_step(f,x,t,dt,[],[1])
 
 def midpoint(
@@ -41,7 +55,7 @@ def midpoint(
     t: Tensor,
     dt: Tensor,
 ):
-    "second order midpoint method"
+    """ Second order midpoint method. NFE=2 """
     return rk_step(f,x,t,dt,[[1/2,1/2]],[0,1])
 
 def heun12(
@@ -51,7 +65,7 @@ def heun12(
     dt: Tensor,
     return_error: bool = False,
 ):
-    "second order Heun's method"
+    """ Second order Heun's method. NFE=2 """
     return rk_step(f,x,t,dt,[[1,1]],[1/2,1/2],[1,0],return_error)
 
 def ralston12(
@@ -61,7 +75,7 @@ def ralston12(
     dt: Tensor,
     return_error: bool = False,
 ):
-    "second order Ralston's method"
+    """ Second order Ralston's method. NFE=2 """
     return rk_step(f,x,t,dt,[[2/3,2/3]],[1/4,3/4],[2/3,1/3],return_error)
 
 def bogacki_shampine23(
@@ -71,7 +85,7 @@ def bogacki_shampine23(
     dt: Tensor,
     return_error: bool = False,
 ):
-    "third order Bogacki-Shampine method"
+    """ Third order Bogacki-Shampine method. NFE=4 """
     ca=[
         [1/2,1/2],
         [3/4,0,3/4],
@@ -87,7 +101,7 @@ def rk4(
     t: Tensor,
     dt: Tensor,
 ):
-    "fourth order Runge-Kutta method"
+    """ Fourth order Runge-Kutta method. NFE=4 """
     ca=[
         [1/2,1/2],
         [1/2,0,1/2],
@@ -102,7 +116,7 @@ def rk4_38rule(
     t: Tensor,
     dt: Tensor,
 ):
-    "fourth order Runge-Kutta method with 3/8 rule"
+    """ Fourth order Runge-Kutta method with 3/8 rule. NFE=4 """
     ca=[
         [1/3,1/3],
         [2/3,-1/3,1],
@@ -118,9 +132,7 @@ def dopri45(
     dt: Tensor,
     return_error: bool = False,
 ):
-    """
-    fifth order Dormand-Prince (RKDP) method
-    """
+    """ Fifth order Dormand-Prince method. NFE=7 """
     ca=[
         [1/5,1/5],
         [3/10,3/40,9/40],
@@ -140,9 +152,7 @@ def fehlberg45(
     dt: Tensor,
     return_error: bool = False,
 ):
-    """
-    fifth order Fehlberg method
-    """
+    """ Fifth order Fehlberg method. NFE=6 """
     ca=[
         [1/4,1/4],
         [3/8,3/32,9/32],
@@ -161,9 +171,7 @@ def cashkarp45(
     dt: Tensor,
     return_error: bool = False,
 ):
-    """
-    fifth order Cash-Karp method
-    """
+    """ Fifth order Cash-Karp method. NFE=6 """
     ca=[
         [1/5,1/5],
         [3/10,3/40,9/40],
@@ -174,15 +182,3 @@ def cashkarp45(
     b=[37/378,0,250/621,125/594,0,512/1771]
     b_star=[2825/27648,0,18575/48384,13525/55296,277/14336,1/4]
     return rk_step(f,x,t,dt,ca,b,b_star,return_error)
-
-class ODESolver(Enum):
-    EULER = {"integrator": euler, "adaptive": False}
-    MIDPOINT = {"integrator": midpoint, "adaptive": False}
-    HEUN12 = {"integrator": heun12, "adaptive": True}
-    RALSTON12 = {"integrator": ralston12, "adaptive": True}
-    BOGACKI_SHAMPINE23 = {"integrator": bogacki_shampine23, "adaptive": True}
-    RK4 = {"integrator": rk4, "adaptive": False}
-    RK4_38RULE = {"integrator": rk4_38rule, "adaptive": False}
-    DOPRI45 = {"integrator": dopri45, "adaptive": True}
-    FEHLBERG45 = {"integrator": fehlberg45, "adaptive": True}
-    CASHKARP45 = {"integrator": cashkarp45, "adaptive": True}

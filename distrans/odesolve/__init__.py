@@ -1,8 +1,21 @@
+import torch
 from typing import Callable, Sequence, Union, Optional
 from torch import Tensor
-from .solver import ODESolver
-import torch
 from dataclasses import dataclass
+from enum import Enum
+from .solver import *
+
+class ODESolver(Enum):
+    EULER = {"integrator": euler, "adaptive": False}
+    MIDPOINT = {"integrator": midpoint, "adaptive": False}
+    HEUN12 = {"integrator": heun12, "adaptive": True}
+    RALSTON12 = {"integrator": ralston12, "adaptive": True}
+    BOGACKI_SHAMPINE23 = {"integrator": bogacki_shampine23, "adaptive": True}
+    RK4 = {"integrator": rk4, "adaptive": False}
+    RK4_38RULE = {"integrator": rk4_38rule, "adaptive": False}
+    DOPRI45 = {"integrator": dopri45, "adaptive": True}
+    FEHLBERG45 = {"integrator": fehlberg45, "adaptive": True}
+    CASHKARP45 = {"integrator": cashkarp45, "adaptive": True}
 
 @dataclass
 class FixedStepConfig:

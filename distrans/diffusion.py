@@ -51,7 +51,7 @@ class Diffuser():
         return self.sqrt_alphas_bar[t]*x_0+self.sqrt_one_minus_alphas_bar[t]*noise
     
     def DDPM_sample(self, 
-                    model: Union[nn.Module, Callable], 
+                    network: Union[nn.Module, Callable], 
                     x_t: torch.Tensor,
                     show_progress=True, 
                     record_trajectory=False,
@@ -61,13 +61,13 @@ class Diffuser():
         Sample from the DDPM model
         
         Args:
-            model (Union[nn.Module, Callable]) The neural network.
+            network (Union[nn.Module, Callable]) The neural network.
             x_t (torch.Tensor): The initial Gaussian noise.
             show_progress (bool): Whether to show the progress bar. Default to True.
             record_trajectory (bool): Whether to record the trajectory. Default to False.
                 If True, the function returns a list of states at each time step.
-            *args: Additional arguments for the model.
-            **kwargs: Additional keyword arguments for the model.
+            *args: Additional arguments for the network.
+            **kwargs: Additional keyword arguments for the network.
             
         Returns: Union[torch.Tensor, Sequence[torch.Tensor]]: The samples from the DDPM model.
         """
@@ -80,7 +80,7 @@ class Diffuser():
         self._match_dim(x_t)
         with torch.no_grad():
             for step in p_bar:
-                noise = model(x_t, t, *args, **kwargs)
+                noise = network(x_t, t, *args, **kwargs)
                 x_t = self.DDPM_sample_step(x_t, t, noise)
                 t = t-1
                 if record_trajectory:
@@ -90,7 +90,7 @@ class Diffuser():
             return x_t
         
     def DDIM_sample(self, 
-                    model: Union[nn.Module, Callable], 
+                    network: Union[nn.Module, Callable], 
                     x_t: torch.Tensor,
                     dt: float,
                     show_progress=True, 
@@ -101,14 +101,14 @@ class Diffuser():
         Sample from the DDIM model
         
         Args:
-            model (Union[nn.Module, Callable]) The neural network.
+            network (Union[nn.Module, Callable]) The neural network.
             x_t (torch.Tensor): The initial data.
             dt (float): The time step.
             show_progress (bool): Whether to show the progress bar. Default to True.
             record_trajectory (bool): Whether to record the trajectory. Default to False.
                 If True, the function returns a list of states at each time step.
-            *args: Additional arguments for the model.
-            **kwargs: Additional keyword arguments for the model.
+            *args: Additional arguments for the network.
+            **kwargs: Additional keyword arguments for the network.
             
         Returns: Union[torch.Tensor, Sequence[torch.Tensor]]: The samples from the DDIM model.
         """
@@ -121,7 +121,7 @@ class Diffuser():
         with torch.no_grad(): 
             while t[0] > 0:
                 dt = min(dt, t[0])
-                noise = model(x_t, t, *args, **kwargs)
+                noise = network(x_t, t, *args, **kwargs)
                 x_t = self.DDIM_sample_step(x_t, t,t-dt, noise)
                 t = t-dt
                 if record_trajectory:

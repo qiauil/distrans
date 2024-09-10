@@ -32,7 +32,7 @@ def plot_dist(data:Union[np.ndarray, torch.Tensor], title:Optional[str]=None, ax
     else:
         return im
         
-def wasserstein_distance(x, y, p=1):
+def wasserstein_distance(x, y, p=1, item=True):
     """
     Computes the Wasserstein distance between two distributions x and y.
     
@@ -52,7 +52,10 @@ def wasserstein_distance(x, y, p=1):
     min_row, _ = torch.min(pairwise_distances, dim=1)
     min_col, _ = torch.min(pairwise_distances, dim=0)
     distance = torch.mean(min_row) + torch.mean(min_col)
-    return distance.item()
+    if item:
+        return distance.item()
+    else:
+        return distance
 
 class Net(nn.Module):
     def __init__(self, in_dim: int=2, out_dim: int=2, h_dims: List[int]=[512]*4,dim_time=32) -> None:

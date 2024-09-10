@@ -14,7 +14,11 @@
 * Distribution transformation from Gaussian: [gaussian.ipynb](https://github.com/qiauil/distrans/blob/main/gaussian.ipynb)
 * Transform moons distribution to swiss distribution: [moons2swiss.ipynb](https://github.com/qiauil/distrans/blob/main/moons2swiss.ipynb)
 
+
 ## References
+
+This work is part of our physics-based deep learning research, please visit [the website of our research group at TUM](https://ge.in.tum.de/publications/) for more information.
+
 ### Diffusion
 * [***Denoising Diffusion Probabilistic Models***, Jonathan Ho, Ajay Jain and Pieter Abbeel, NeurIPS, 2020](https://arxiv.org/abs/2006.11239)
 * [***Diffusion Models Beat GANs on Image Synthesis***, Prafulla Dhariwal and Alex Nichol, NeurIPS, 2021](https://arxiv.org/abs/2105.05233)

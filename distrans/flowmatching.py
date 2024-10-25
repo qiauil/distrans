@@ -81,7 +81,7 @@ class ConditionalFlowMatcher(ABC):
         with torch.no_grad():
             def wrapper(t,x):
                 return network(x,
-                            t*torch.ones((x.shape[0],)).to(x_0.device),
+                            t*torch.ones((x.shape[0],),device=x_0.device),
                             *args,
                             **kwargs)
             return odeint(
@@ -98,7 +98,7 @@ class ConditionalFlowMatcher(ABC):
         network:nn.Module,
         x_0:torch.tensor,
         num_steps:int,
-        solver:ODESolver=ODESolver.DOPRI45,
+        solver:ODESolver=ODESolver.EULER,
         full_trajectory :bool =False,
         *args,
         **kwargs) -> torch.tensor:

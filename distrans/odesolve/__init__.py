@@ -113,9 +113,8 @@ def odeint(
             dt = t_1 - t_0
         else:
             dt = torch.as_tensor(solver_config.dt, dtype=x_0.dtype, device=x_0.device)
-        sign = torch.sign(dt)
-        while sign * (t_1 - t) > 0:
-            dt = sign * torch.min(abs(dt), abs(t_1 - t))
+        while (t_1 - t) > 0:
+            dt = torch.min(abs(dt), abs(t_1 - t))
             if adaptive:
                 while True:
                     y, error = solver(f, x, t, dt, return_error=True)
